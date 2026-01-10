@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <script>window.yaContextCb=window.yaContextCb||[]</script>
+    <script src="https://yandex.ru/ads/system/context.js" async></script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>DAMI IPTV</title>
+    <meta name="description" content="مشغل IPTV متطور يدعم جميع الأجهزة">
+    
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/716/716429.png">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* تعريف متغيرات الألوان للوضعين */
+        :root {
+            /* الوضع المظلم (الافتراضي) */
+            --primary: #00d2ff;
+            --bg: #0f1016;
+            --sidebar-bg: #161823;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-muted: #a0a0a0;
+            --border: rgba(255, 255, 255, 0.1);
+            --header-bg: rgba(15, 16, 22, 0.95);
+            --header-height: 70px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        body.light-mode {
+            /* الوضع النهاري */
+            --bg: #f0f2f5;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --input-bg: #e4e6eb;
+            --text: #1c1e21;
+            --text-muted: #65676b;
+            --border: #ced0d4;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+            padding-top: var(--header-height);
+        }
+
+        /* تنسيق الهيدر */
+        .app-header {
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1050;
+            border-bottom: 1px solid var(--border);
+            height: var(--header-height);
+            display: flex; align-items: center;
+            transition: background 0.3s;
+        }
+
+        .app-logo { font-weight: 800; font-size: 1.4rem; color: var(--text); text-decoration: none; }
+        .app-logo span { color: var(--primary); }
+
+        /* حقول البحث والإدخال */
+        .search-container {
+            background: var(--input-bg);
+            border-radius: 50px;
+            padding: 8px 20px;
+            border: 1px solid transparent;
+        }
+        .search-container input, .form-control-custom {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            outline: none;
+            width: 100%;
+        }
+        .search-container:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.2);
+        }
+
+        /* تنسيق القائمة الجانبية (Sidebar) */
+        .offcanvas {
+            background-color: var(--sidebar-bg);
+            color: var(--text);
+        }
+        .offcanvas-header {
+            border-bottom: 1px solid var(--border);
+        }
+        .btn-close-custom {
+            filter: invert(1) grayscale(100%) brightness(200%); /* للأبيض */
+        }
+        body.light-mode .btn-close-custom {
+            filter: none; /* للأسود */
+        }
+        
+        .country-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--text);
+        }
+        .country-item:hover { background: var(--primary); color: #fff; }
+
+        /* مشغل الفيديو */
+        .video-wrapper {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-top: 15px;
+        }
+
+        /* كروت القنوات */
+        .channel-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 15px 10px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+            height: 100%;
+            color: var(--text);
+            box-shadow: var(--shadow);
+        }
+        .channel-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+        .channel-card img {
+            background: #fff; /* اللوجو يحتاج خلفية بيضاء دائماً */
+            padding: 5px;
+            border-radius: 12px;
+            width: 50px; height: 50px; object-fit: contain;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* أزرار الأدوات */
+        .btn-tool {
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+        .btn-tool:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* الفوتر */
+        footer {
+            background: var(--sidebar-bg);
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            margin-top: 60px;
+            color: var(--text-muted);
+        }
+
+        /* تحسينات الموبايل */
+        .mobile-search-area {
+            position: sticky; top: var(--header-height);
+            z-index: 1040;
+            background: var(--bg);
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* أيقونات وأزرار */
+        .text-themed { color: var(--text); }
+        .text-muted-themed { color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="container-fluid px-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn p-0 text-themed" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+                    <i class="bi bi-list fs-1"></i>
+                </button>
+                <a href="#" class="app-logo">DAMI<span>IPTV</span></a>
+            </div>
+
+            <div class="search-container d-none d-md-flex flex-grow-1 mx-5" style="max-width: 500px;">
+                <i class="bi bi-search text-muted-themed me-2 mt-1"></i>
+                <input type="text" id="globalSearchInput" placeholder="بحث عالمي..." onkeyup="if(event.key==='Enter') searchGlobal()">
+            </div>
+
+            <button class="btn btn-tool p-2 rounded-circle" onclick="toggleTheme()" id="themeBtn" style="width: 40px; height: 40px;">
+                <i class="bi bi-moon-stars-fill"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="d-md-none mobile-search-area shadow-sm">
+        <div class="search-container d-flex align-items-center">
+            <i class="bi bi-search text-muted-themed me-2"></i>
+            <input type="text" id="mobileSearchInput" placeholder="بحث عن قناة..." onkeyup="if(event.key==='Enter') searchGlobal('mobile')">
+        </div>
+    </div>
+
+    <div class="container-fluid px-2 px-md-4">
+        
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title fw-bold text-primary">قائمة الدول</h5>
+                <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="p-3">
+                <div class="search-container">
+                    <input type="text" placeholder="تصفية الدول..." oninput="filterCountries(this.value)">
+                </div>
+            </div>
+            <div class="offcanvas-body p-0" id="countryContainer"></div>
+        </div>
+
+        <div class="row justify-content-center">
+            <main class="col-12 col-xl-10">
+                
+                <div class="video-wrapper">
+                    <video id="player" playsinline controls crossorigin class="w-100 h-100"></video>
+                </div>
+
+                <div class="d-flex gap-2 my-4 overflow-x-auto pb-2 px-1">
+                    <button class="btn btn-primary text-white rounded-3" onclick="document.getElementById('fileLoader').click()">
+                        <i class="bi bi-cloud-arrow-up-fill"></i> رفع ملف
+                    </button>
+                    <button class="btn btn-tool" onclick="promptUrlImport()">
+                        <i class="bi bi-link-45deg"></i> رابط خارجي
+                    </button>
+                    <input type="file" id="fileLoader" hidden onchange="importFromFile(this)">
+                </div>
+
+                <div class="channels-section">
+                    <h5 class="mb-3 fw-bold border-bottom pb-2" style="border-color: var(--border) !important; display: inline-block;">القنوات المتاحة</h5>
+                    <div class="row g-2 g-md-3" id="channelsGrid">
+                        <div class="col-12 text-center py-5 opacity-50 text-themed">
+                            <i class="bi bi-tv fs-1 d-block mb-3"></i>
+                            <p>اختر دولة من القائمة أو ابحث عن قناة للبدء</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="my-4 text-center">
+                    <div id="yandex_rtb_R-A-18387837-1"></div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container text-center">
+            <a href="#" class="app-logo fs-3 mb-3 d-block">DAMI<span>IPTV</span></a>
+            <p class="small">مشغل IPTV متطور يدعم جميع صيغ البث المباشر.</p>
+            <div class="mt-3 small">
+                © 2026 تم التصميم والتطوير بواسطة <span class="text-primary">عماد الدين لمراني</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
+    <script>
+        const video = document.getElementById('player');
+        const player = new Plyr(video);
+        let allCountries = [];
+        let hls;
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const btn = document.getElementById('themeBtn');
+            const isLight = document.body.classList.contains('light-mode');
+            
+            // تغيير أيقونة الزر
+            btn.innerHTML = isLight ? '<i class="bi bi-sun-fill text-warning"></i>' : '<i class="bi bi-moon-stars-fill"></i>';
+            
+            // تحديث زر الإغلاق في السايدبار
+            const closeBtn = document.querySelector('.btn-close');
+            if(isLight) {
+                closeBtn.classList.remove('btn-close-white');
+            } else {
+                closeBtn.classList.add('btn-close-white'); // إعادة اللون الأبيض في الوضع المظلم
+            }
+        }
+
+        // نفس دوال الجلب والتشغيل السابقة تماماً
+        async function fetchCountries() {
+            try {
+                const res = await fetch('https://iptv-org.github.io/api/countries.json');
+                allCountries = await res.json();
+                renderCountries(allCountries.sort((a,b) => a.name.localeCompare(b.name)));
+            } catch (e) {}
+        }
+
+        function renderCountries(data) {
+            const container = document.getElementById('countryContainer');
+            container.innerHTML = '';
+            data.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'country-item d-flex align-items-center';
+                div.innerHTML = `<img src="https://flagcdn.com/w40/${c.code.toLowerCase()}.png" width="24" class="me-3 shadow-sm rounded-1"> <span>${c.name}</span>`;
+                div.onclick = () => {
+                    loadCountryChannels(c.code);
+                    bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('sidebarMenu')).hide();
+                };
+                container.appendChild(div);
+            });
+        }
+
+        function filterCountries(q) {
+            renderCountries(allCountries.filter(c => c.name.toLowerCase().includes(q.toLowerCase())));
+        }
+
+        async function loadCountryChannels(code) {
+            const grid = document.getElementById('channelsGrid');
+            grid.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>';
+            try {
+                const res = await fetch(`https://iptv-org.github.io/iptv/countries/${code.toLowerCase()}.m3u`);
+                const text = await res.text();
+                parseM3U(text);
+            } catch (e) { grid.innerHTML = '<div class="col-12 text-center py-4">لا توجد قنوات.</div>'; }
+        }
+
+        function parseM3U(text) {
+            const grid = document.getElementById('channelsGrid');
+            grid.innerHTML = '';
+            const lines = text.split('\n');
+            let current = {};
+            lines.forEach(line => {
+                if (line.startsWith('#EXTINF:')) {
+                    current.name = line.split(',').pop().trim();
+                    const logo = line.match(/tvg-logo="([^"]+)"/);
+                    current.logo = logo ? logo[1] : '';
+                } else if (line.startsWith('http')) {
+                    if(current.name) renderChannel(current.name, current.logo, line.trim());
+                    current = {};
+                }
+            });
+        }
+
+        function renderChannel(name, logo, url) {
+            const grid = document.getElementById('channelsGrid');
+            const col = document.createElement('div');
+            col.className = 'col-6 col-sm-4 col-md-3 col-lg-2';
+            const img = logo || 'https://cdn-icons-png.flaticon.com/512/716/716429.png';
+            col.innerHTML = `
+                <div class="channel-card" title="${name}">
+                    <img src="${img}" loading="lazy" onerror="this.src='https://cdn-icons-png.flaticon.com/512/716/716429.png'">
+                    <span class="d-block mt-2 text-truncate">${name}</span>
+                </div>`;
+            col.onclick = () => { play(url); window.scrollTo({top: 0, behavior: 'smooth'}); };
+            grid.appendChild(col);
+        }
+
+        function play(url) {
+            if (Hls.isSupported()) {
+                if (hls) hls.destroy();
+                hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
+            } else { video.src = url; }
+            video.play();
+        }
+
+        function promptUrlImport() {
+            const url = prompt("أدخل الرابط:");
+            if(url) fetch(url).then(r => r.text()).then(parseM3U);
+        }
+
+        function importFromFile(input) {
+            const reader = new FileReader();
+            reader.onload = (e) => parseM3U(e.target.result);
+            reader.readAsText(input.files[0]);
+        }
+
+        async function searchGlobal(mode) {
+            const q = (mode==='mobile')?document.getElementById('mobileSearchInput').value:document.getElementById('globalSearchInput').value;
+            if(!q) return;
+            const grid = document.getElementById('channelsGrid');
+            grid.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>';
+            try {
+                const [resS, resC] = await Promise.all([
+                    fetch('https://iptv-org.github.io/api/streams.json').then(r => r.json()),
+                    fetch('https://iptv-org.github.io/api/channels.json').then(r => r.json())
+                ]);
+                grid.innerHTML = '';
+                resC.filter(c => c.name && c.name.toLowerCase().includes(q.toLowerCase())).slice(0,30).forEach(chan => {
+                    const s = resS.find(st => st.channel === chan.id);
+                    if(s) renderChannel(chan.name, chan.logo, s.url);
+                });
+            } catch(e) {}
+        }
+
+        fetchCountries();
+    </script>
+    
+    <script>
+    window.yaContextCb.push(() => {
+        Ya.Context.AdvManager.render({
+            "blockId": "R-A-18387837-1",
+            "renderTo": "yandex_rtb_R-A-18387837-1"
+        })
+    })
+    </script>
+</body>
+</html>
